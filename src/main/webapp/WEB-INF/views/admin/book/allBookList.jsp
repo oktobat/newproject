@@ -5,7 +5,7 @@
 <table>
 	<thead>
 		<tr>
-			<th>도서명</th>
+			<th>김은영 수정</th>
 			<th>저자</th>
 			<th>발행처</th>
 			<th>발행연도</th>
