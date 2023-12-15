@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+#section_wrap {
+	max-width:1200px;
+	margin:50px auto;
+}
+
+#section_wrap .word { text-align:center; }

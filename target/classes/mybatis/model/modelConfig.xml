@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.office.library.admin.member.AdminMemberVo"  alias="adminMemberVo" />
+		<typeAlias type="com.office.library.book.BookVo"  alias="bookVo" />
+		<typeAlias type="com.office.library.book.HopeBookVo"  alias="hopeBookVo" />
+		<typeAlias type="com.office.library.book.RentalBookVo"  alias="rentalBookVo" />
+		<typeAlias type="com.office.library.book.ReviewBookVo"  alias="reviewBookVo" />
+		<typeAlias type="com.office.library.book.LikeBookVo"  alias="likeBookVo" />
+		<typeAlias type="com.office.library.book.PhotoReviewVo"  alias="photoReviewVo" />
+		<typeAlias type="com.office.library.book.MallBookVo"  alias="mallBookVo" />
+		<typeAlias type="com.office.library.book.CartBookVo"  alias="cartBookVo" />
+		<typeAlias type="com.office.library.user.member.UserMemberVo"  alias="userMemberVo" />
+		<typeAlias type="com.office.library.book.OrderVo"  alias="orderVo" />
+		<typeAlias type="com.office.library.book.OrderDetailVo"  alias="orderDetailVo" />
+	</typeAliases>
+</configuration>

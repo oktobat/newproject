@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.adminMember">
+
+	<select id="selectAdmins" resultType="adminMemberVo">
+      <![CDATA[
+         SELECT * FROM tbl_admin_member ORDER BY a_m_name ASC	 	
+      ]]>
+	</select>
+	
+	<select id="selectAdmin" resultType="adminMemberVo" parameterType="String">
+         SELECT * FROM tbl_admin_member WHERE a_m_id = #{a_m_id}	 	
+	</select>
+	
+	<select id="idCheck" resultType="int" parameterType="String">
+        SELECT Count(*) FROM tbl_admin_member WHERE a_m_id = #{a_m_id}	 	
+	</select>
+	
+	<select id="selectAdminFind" resultType="adminMemberVo" parameterType="hashmap">
+         SELECT * FROM tbl_admin_member WHERE a_m_id=#{a_m_id} and a_m_name=#{a_m_name} and a_m_mail=#{a_m_mail}	 	
+	</select>
+
+	<insert id="insertAdminAccount"  parameterType="adminMemberVo">
+		INSERT INTO tbl_admin_member(
+		<if test='a_m_id.equals("superman")'>a_m_approval,</if>
+		a_m_id, a_m_pw, a_m_name, a_m_gender, a_m_part, a_m_position, a_m_mail, a_m_phone, a_m_reg_date, a_m_mod_date
+		)
+		VALUES (
+		<if test='a_m_id.equals("superman")'>1,</if>
+		 #{a_m_id}, #{a_m_pw}, #{a_m_name}, #{a_m_gender}, #{a_m_part}, #{a_m_position}, #{a_m_mail}, #{a_m_phone}, now(), now()
+		)
+	</insert>
+	
+	
+</mapper>

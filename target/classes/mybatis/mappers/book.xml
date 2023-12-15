@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.book">
+
+	<select id="selectBooks" resultType="bookVo" parameterType="bookVo">
+         SELECT * FROM tbl_book 
+         <if test="b_name != null">
+        	WHERE b_name LIKE CONCAT('%', #{b_name}, '%') 
+        	or b_author LIKE CONCAT('%', #{b_name}, '%') 
+        	or b_publisher LIKE CONCAT('%', #{b_name}, '%')
+    	 </if>
+    	 ORDER BY b_name
+ 	</select>	
+ 	
+ 	<insert id="insertReviewBook" parameterType="reviewBookVo">
+ 		INSERT INTO 
+ 		tbl_review_book 
+ 		(b_no, u_m_no, rev_content, rev_reg_date, rev_mod_date) 
+ 		VALUES 
+ 		(#{b_no}, #{u_m_no}, #{rev_content}, now(), now() )
+ 	</insert>
+ 	
+ 	<update id="revCountUpdate" parameterType="reviewBookVo">
+ 		UPDATE tbl_book SET rev_b_no_count = rev_b_no_count + 1 
+ 		WHERE b_no=#{b_no}
+ 	</update>
+	
+	<update id="revCountMinusUpdate" parameterType="reviewBookVo">
+ 		UPDATE tbl_book SET rev_b_no_count = rev_b_no_count - 1 
+ 		WHERE b_no=#{b_no}
+ 	</update>
+	
+	<select id="selectBnoReview" resultType="reviewBookVo" parameterType="reviewBookVo">
+		SELECT * FROM tbl_review_book A
+		JOIN tbl_user_member B ON A.u_m_no = B.u_m_no
+		WHERE b_no=#{b_no} ORDER BY rev_no DESC
+	</select>
+	
+	<update id="reviewBookUpdate" parameterType="reviewBookVo">
+		UPDATE tbl_review_book SET rev_content = #{rev_content}, rev_mod_date = now() 
+ 		WHERE rev_no=#{rev_no}
+	</update>
+	
+	<delete id="reviewBookDelete" parameterType="reviewBookVo">
+		DELETE FROM tbl_review_book WHERE rev_no=#{rev_no}
+	</delete>
+	
+	<select id="requestBookLikeCount" resultType="int" parameterType="likeBookVo">
+		SELECT Count(*) FROM tbl_like_book WHERE b_no = #{b_no}
+	</select>
+	
+	<select id="requestBookLikeStatus" resultType="int" parameterType="likeBookVo">
+		SELECT Count(*) FROM tbl_like_book WHERE b_no = #{b_no} AND u_m_no = #{u_m_no}
+	</select>
+	
+	<insert id="requestBookLikeInsert" parameterType="likeBookVo">
+		INSERT INTO tbl_like_book (b_no, u_m_no) VALUES (#{b_no}, #{u_m_no})
+	</insert>
+	
+	<delete id="requestBookLikeDelete" parameterType="likeBookVo">
+		DELETE FROM tbl_like_book WHERE b_no = #{b_no} AND u_m_no = #{u_m_no}
+	</delete>
+	
+	<update id="requestBookBnoLikeCountUpdate" parameterType="hashmap">
+		UPDATE tbl_book SET like_b_no_count = #{count} 
+ 		WHERE b_no=#{b_no}
+	</update>
+	
+	<insert id="photoReviewConfirm" parameterType="photoReviewVo">
+		INSERT INTO tbl_photo_review (u_m_no, pr_name, pr_author, pr_publisher, pr_photo0, pr_photo1, pr_photo2) 
+		VALUES (#{u_m_no}, #{pr_name}, #{pr_author}, #{pr_publisher}, 
+		<choose>
+            <when test="pr_photo != null and pr_photo.size() > 0">#{pr_photo[0]}</when>
+            <otherwise>''</otherwise>
+        </choose>,
+		<choose>
+			<when test="pr_photo != null and pr_photo.size() > 1">#{pr_photo[1]}</when>
+            <otherwise>''</otherwise>
+        </choose>,
+        <choose>
+            <when test="pr_photo != null and pr_photo.size() > 2">#{pr_photo[2]}</when>
+            <otherwise>''</otherwise>
+        </choose>
+		)
+	</insert>
+	
+	<select id="photoReviewAll" resultType="photoReviewVo" parameterType="hashmap">
+		SELECT * FROM tbl_photo_review
+		ORDER BY pr_no DESC
+		LIMIT #{scale} OFFSET #{pNum};
+	</select>
+	
+	<select id="photoReviewCount" resultType="int">
+		 SELECT Count(*) FROM tbl_photo_review
+	</select>
+	
+	<insert id="bookMallInsert" parameterType="mallBookVo">
+		INSERT INTO tbl_mall_book (bm_name, bm_author, bm_publisher, bm_isbn, bm_price, bm_quantity, bm_photo0, bm_photo1, bm_photo2)
+		VALUES (#{bm_name}, #{bm_author}, #{bm_publisher}, #{bm_isbn}, #{bm_price}, #{bm_quantity}, 
+		   <choose>
+            <when test="bm_photo != null and bm_photo.size() > 0">#{bm_photo[0]}</when>
+            <otherwise>''</otherwise>
+        </choose>,
+		<choose>
+			<when test="bm_photo != null and bm_photo.size() > 1">#{bm_photo[1]}</when>
+            <otherwise>''</otherwise>
+        </choose>,
+        <choose>
+            <when test="bm_photo != null and bm_photo.size() > 2">#{bm_photo[2]}</when>
+            <otherwise>''</otherwise>
+        </choose>
+		)
+	</insert>
+	
+	<select id="mallBookListAll" resultType="mallBookVo" parameterType="hashmap">
+        SELECT * FROM tbl_mall_book 
+        ORDER BY bm_no DESC
+		LIMIT #{scale} OFFSET #{pNum};
+	</select>
+	
+	<select id="mallBookListCount" resultType="int">
+		SELECT Count(*) FROM tbl_mall_book
+	</select>
+	
+	<insert id="cartInsert" parameterType="hashmap">
+		INSERT INTO tbl_cart_book (bm_no, u_m_no) 
+		VALUES (#{bm_no}, #{user_no})
+	</insert>
+	
+	<select id="cartSelectUser" resultType="cartBookVo" parameterType="int">
+		SELECT * FROM tbl_mall_book A
+		JOIN tbl_cart_book B
+		ON A.bm_no = B.bm_no
+		WHERE B.u_m_no=#{user_no}	
+	</select>
+	
+	<insert id="cartSessionInsert" parameterType="java.util.List">
+		INSERT INTO tbl_cart_book (bm_no, u_m_no, cart_qty)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.bm_no}, #{item.u_m_no}, #{item.cart_qty})
+		</foreach>
+		ON DUPLICATE KEY UPDATE cart_qty = IF(VALUES(cart_qty) > cart_qty, VALUES(cart_qty), cart_qty)
+	</insert>
+	
+	<!--  
+	<select id="cartInSelect" resultType="int" parameterType="cartBookVo">
+		SELECT Count(*) FROM tbl_cart_book 
+		WHERE bm_no = #{bm_no} AND u_m_no = #{u_m_no} 
+	</select>
+	-->
+	
+	<!-- 테이블 설계시 UNIQUE 제약조건 추가하기 
+		CREATE TABLE tbl_cart_book (
+		    cart_no INT PRIMARY KEY AUTO_INCREMENT,
+		    bm_no INT NOT NULL,
+		    u_m_no INT NOT NULL,
+		    cart_qty INT NOT NULL default 1,
+		    UNIQUE KEY unique_cart (bm_no, u_m_no)
+	    );
+	    테이블 설계 후 UNIQUE 제약조건 추가하기
+		    ALTER TABLE tbl_cart_book
+	    	ADD CONSTRAINT unique_cart UNIQUE (bm_no, u_m_no);
+        제약조건 삭제하기
+		    ALTER TABLE tbl_cart_book
+		    DROP CONSTRAINT unique_cart;
+	-->
+	<insert id="cartInsertLogin" parameterType="cartBookVo">
+		INSERT INTO tbl_cart_book (bm_no, u_m_no, cart_qty) 
+		VALUES (#{bm_no}, #{u_m_no}, #{cart_qty})
+	</insert>
+	
+	
+	<update id="updateQty" parameterType="cartBookVo">
+		UPDATE tbl_cart_book SET cart_qty=#{cart_qty}
+		WHERE bm_no=#{bm_no} AND u_m_no=#{u_m_no}
+	</update>
+	
+	<delete id="removeCart" parameterType="cartBookVo">
+		DELETE FROM tbl_cart_book 
+		WHERE bm_no=#{bm_no} AND u_m_no=#{u_m_no}
+	</delete>
+	
+	<select id="orderList" resultType="cartBookVo" parameterType="java.util.List">
+		SELECT * FROM tbl_cart_book C
+		JOIN tbl_mall_book M ON C.bm_no=M.bm_no
+		JOIN tbl_user_member U ON C.u_m_no=U.u_m_no
+	    WHERE 
+	    <foreach collection="list" item="item" open="(" separator=") OR (" close=")">
+	    	C.bm_no=#{item.bm_no} AND C.u_m_no=#{item.u_m_no}
+	    </foreach>
+	</select>
+	
+
+	<insert id="purchase" parameterType="orderVo" useGeneratedKeys="true" keyProperty="order_no">
+		INSERT INTO tbl_order (order_status, order_date, u_m_no, delivery_name, delivery_address, delivery_phone, order_comment)
+		VALUES (#{order_status}, now(), #{u_m_no}, #{delivery_name}, #{delivery_address}, #{delivery_phone}, #{order_comment})
+	</insert>
+	  
+	<!--  
+	<insert id="orderDetailInsert" parameterType="orderDetailVo">
+		INSERT INTO tbl_order_detail (order_no, bm_no, order_qty, total_price)
+		VALUES (#{order_no}, #{bm_no}, #{order_qty},(
+			SELECT #{order_qty} * A.bm_price
+			FROM tbl_mall_book A
+			WHERE A.bm_no = #{bm_no}
+		))
+	</insert>
+	-->
+		
+		
+	<!--  
+		ALTER TABLE tbl_order_detail
+		ADD CONSTRAINT fk_order_detail_order
+		FOREIGN KEY (order_no) REFERENCES tbl_order(order_no) ON DELETE CASCADE;
+	-->	
+	<insert id="orderDetailInsert" parameterType="java.util.List">
+		INSERT INTO tbl_order_detail (order_no, bm_no, order_qty, total_price)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.order_no}, #{item.bm_no}, #{item.order_qty}, (
+			SELECT #{item.order_qty} * A.bm_price
+			FROM tbl_mall_book A
+			WHERE A.bm_no = #{item.bm_no}
+		))
+		</foreach>
+	</insert>	
+		
+	<delete id="cartDelete" parameterType="java.util.List">
+		DELETE FROM tbl_cart_book 
+		WHERE 
+		<foreach collection="list" item="item" open="(" separator=") OR (" close=")">
+			bm_no=#{item.bm_no} AND u_m_no=#{item.u_m_no}
+		</foreach>
+	</delete>
+	
+	<select id="orderUserSelect" resultType="orderVo" parameterType="int">
+		 SELECT A.order_no, tbl_order.order_status, tbl_order.order_date, A.total_price, B.bm_name, A.cnt
+    FROM
+        (
+            SELECT
+                order_no,
+                SUM(total_price) AS total_price,
+                MIN(bm_no) AS bm_no,
+                Count(bm_no) AS cnt
+            FROM
+                tbl_order_detail
+            WHERE
+                order_no IN (SELECT order_no FROM tbl_order WHERE u_m_no = #{u_m_no})
+            GROUP BY order_no
+        ) A
+    JOIN tbl_mall_book B ON A.bm_no = B.bm_no
+    JOIN tbl_order ON A.order_no = tbl_order.order_no
+    ORDER BY tbl_order.order_date DESC;
+	</select>
+	
+	<select id="orderDetail" resultType="orderVo" parameterType="int">
+		SELECT * FROM tbl_order_detail A
+		JOIN tbl_order B ON b.order_no = A.order_no
+		JOIN tbl_mall_book C on C.bm_no = A.bm_no
+		JOIN tbl_user_member D on D.u_m_no = B.u_m_no
+		WHERE A.order_no = #{order_no}
+	</select>
+	
+	<update id="inventoryUpdate" parameterType="orderDetailVo">
+        UPDATE tbl_mall_book 
+        SET bm_quantity = bm_quantity - #{order_qty}
+        WHERE bm_no = #{bm_no}
+	</update>
+	
+	<delete id="orderCancel" parameterType="int">
+		DELETE FROM tbl_order WHERE order_no = #{order_no}
+	</delete>
+	
+	<update id="itemHit" parameterType="int">
+		UPDATE tbl_photo_review SET pr_hit = pr_hit + 1
+		WHERE pr_no=#{pr_no}
+	</update>
+	
+	<select id="itemDetail" resultType="photoReviewVo" parameterType="int">
+		SELECT * FROM tbl_photo_review WHERE pr_no=#{pr_no}
+	</select>
+	
+	
+</mapper>
